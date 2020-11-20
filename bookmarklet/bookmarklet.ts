@@ -309,7 +309,7 @@ async function bookEntry(): Promise<void> {
       setEnabled(input, true);
 
       const refreshButton = document.querySelector(
-        'button[ng-click="refresh()"]',
+        'button[ng-reflect-icon="reload"]',
       ) as HTMLButtonElement;
 
       if (refreshButton) {
