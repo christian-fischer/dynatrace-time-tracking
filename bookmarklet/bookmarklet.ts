@@ -308,8 +308,9 @@ async function bookEntry(): Promise<void> {
     } else {
       setEnabled(input, true);
 
-      const refreshButton = document.querySelector(
-        'button[ng-reflect-icon="reload"]',
+      const refreshButton = Array.prototype.find.call(
+        document.querySelectorAll('button'),
+        (button) => button.innerText === 'Refresh',
       ) as HTMLButtonElement;
 
       if (refreshButton) {
