@@ -310,7 +310,9 @@ async function bookEntry(): Promise<void> {
 
       const refreshButton = Array.prototype.find.call(
         document.querySelectorAll('button'),
-        (button) => button.innerText === 'Refresh',
+        (button) =>
+          button.title.includes('Refresh data') ||
+          button.title.includes('Daten aktualisieren'),
       ) as HTMLButtonElement;
 
       if (refreshButton) {
