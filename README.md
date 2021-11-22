@@ -6,8 +6,8 @@ and booking their working time.
 
 After the transition to Timecockpit on 2019-04-01 you'll need:
 
-- my [**Excel spreadsheet**](./spreadsheet/spreadsheet_template_de_v18.xlsx)
-  v18+ and
+- my [**Excel spreadsheet**](./spreadsheet/)
+  v19+ and
 - my **bookmarklet**
 
 ...to track your working times easily and book them in Timecockpit
