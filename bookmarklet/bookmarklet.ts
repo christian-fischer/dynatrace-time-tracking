@@ -338,6 +338,7 @@ async function createContent(): Promise<void> {
 								<select id="${idSelectType}" class="filament-select-css">
 									<option value="cd4f750b-85f8-41f8-b193-9c82e23f82eb" selected="selected">Office</option>
 									<option value="0ad94cf7-955c-45dc-b49e-20be0f449b75">Home Office</option>
+                  <option value="43007851-87f0-468d-b9d2-376ede4a8fd2">Field Service</option>
 								</select>
 							</div>
 							<div id="${idMain}">
