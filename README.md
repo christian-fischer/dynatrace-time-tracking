@@ -49,6 +49,14 @@ javascript:void%20function(){var%20e=document.createElement(%22script%22);e.src=
 
 ![](resources/timecockpit.png)
 
+## FAQ
+
+- **Issue**: The daily/weekly sums are too small/displayed wrong (i.e. `0,008h`
+  instead of `8,000h`)
+- **Solution**: Configure a compatible regional format (with comma `,` as
+  decimal separator) in the _Windows regional settings_ (i.e `German (Austria)`
+  or `English (Austria)`)
+
 ## Compile code with generated source maps
 
 Run the following commands after cloning the repository (requires Node.js >= 10
