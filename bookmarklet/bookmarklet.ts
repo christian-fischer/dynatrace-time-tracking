@@ -33,6 +33,8 @@ const idButtonBook = 'com_kamilsarelo_dynatrace_timetracking_action_book';
 const idButtonClear = 'com_kamilsarelo_dynatrace_timetracking_action_clear';
 const idButtonClose = 'com_kamilsarelo_dynatrace_timetracking_action_close';
 const idLoader = 'com_kamilsarelo_dynatrace_timetracking_loader';
+const idSetDefaultButton =
+  'com_kamilsarelo_dynatrace_timetracking_set_default_button';
 
 // caches
 const cacheTaskIdAndProjectId = new Map();
@@ -98,9 +100,7 @@ function computeTimecockpitEntryProperties(
     return;
   }
   const stringJiraKey = line.substring(23, indexOfPipe); // https://stackoverflow.com/questions/2243824/what-is-the-difference-between-string-slice-and-string-substring
-  if (stringJiraKey === '') {
-    return;
-  }
+
   // comment
   const stringComment = line.substr(indexOfPipe + 1);
   if (stringComment === '') {
@@ -329,6 +329,33 @@ async function createContent(): Promise<void> {
   clear();
   await loadCss();
 
+  const options = [
+    {
+      value: 'cd4f750b-85f8-41f8-b193-9c82e23f82eb',
+      label: 'Office',
+      selected: true, // set as default
+    },
+    {
+      value: '0ad94cf7-955c-45dc-b49e-20be0f449b75',
+      label: 'Home Office',
+      selected: false,
+    },
+    {
+      value: '43007851-87f0-468d-b9d2-376ede4a8fd2',
+      label: 'Field Service',
+      selected: false,
+    },
+  ];
+
+  const defaultTypeUuidLocalStorageKey = 'defaultTimesheetTypeUuid';
+
+  const selectedType = localStorage.getItem(defaultTypeUuidLocalStorageKey); // load from local storage
+  if (selectedType) {
+    options.forEach((option) => {
+      option.selected = option.value === selectedType;
+    });
+  }
+
   // HTML
   const dummy = document.createElement('dummy');
   dummy.innerHTML = `
@@ -336,10 +363,16 @@ async function createContent(): Promise<void> {
 						<div id="${idContent}">
 							<div id="${idHeader}">
 								<select id="${idSelectType}" class="filament-select-css">
-									<option value="cd4f750b-85f8-41f8-b193-9c82e23f82eb" selected="selected">Office</option>
-									<option value="0ad94cf7-955c-45dc-b49e-20be0f449b75">Home Office</option>
-                  <option value="43007851-87f0-468d-b9d2-376ede4a8fd2">Field Service</option>
+                ${options
+                  .map(
+                    (option) =>
+                      `<option value="${option.value}" ${
+                        option.selected ? 'selected ' : ''
+                      }>${option.label}</option>`,
+                  )
+                  .join('')}
 								</select>
+                <button id="${idSetDefaultButton}" style="all: unset; cursor: pointer; margin-left: 30px">Set as default</button>
 							</div>
 							<div id="${idMain}">
 								<div id="${idInput}" contenteditable="true">
@@ -392,6 +425,13 @@ async function createContent(): Promise<void> {
 
   document.getElementById(idButtonBook)!.onclick = () => {
     bookEntry();
+  };
+
+  document.getElementById(idSetDefaultButton)!.onclick = () => {
+    localStorage.setItem(
+      defaultTypeUuidLocalStorageKey,
+      (document.getElementById(idSelectType) as HTMLSelectElement).value,
+    );
   };
 
   document.getElementById(idButtonClear)!.onclick = () => {
@@ -521,13 +561,17 @@ async function queryTaskIdAndProjectIdForJiraKey(
   async function nextStep() {
     const cache = cacheTaskIdAndProjectId.get(properties.jiraKey);
 
-    properties.APP_TaskUuid = cache.APP_TaskUuid;
-    properties.APP_ProjectUuid = cache.APP_ProjectUuid;
+    if (cache) {
+      properties.APP_TaskUuid = cache.APP_TaskUuid;
+      properties.APP_ProjectUuid = cache.APP_ProjectUuid;
+    }
 
     await createEntity(properties, callback);
   }
 
-  if (cacheTaskIdAndProjectId.has(properties.jiraKey)) {
+  // if the jiraKey is already cached or the jiraKey is empty,
+  // then we can skip the xhr request and create the entity directly
+  if (cacheTaskIdAndProjectId.has(properties.jiraKey) || !properties.jiraKey) {
     await nextStep(); // not deferred, because async xhr starts immediately in next step
     return; // avoid running callback too early
   }
