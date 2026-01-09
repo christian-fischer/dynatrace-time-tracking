@@ -86,6 +86,7 @@ function computeTimecockpitEntryProperties(
     '|' !== line.charAt(16) ||
     '|' !== line.charAt(22)
   ) {
+    console.error('basic sanity check');
     return;
   }
 
@@ -97,6 +98,7 @@ function computeTimecockpitEntryProperties(
   const indexOfPipe = line.indexOf('|', 23);
   if (indexOfPipe === -1) {
     // no delimiter after Jira key
+    console.error('no delimiter after jira key');
     return;
   }
   const stringJiraKey = line.substring(23, indexOfPipe); // https://stackoverflow.com/questions/2243824/what-is-the-difference-between-string-slice-and-string-substring
@@ -105,6 +107,7 @@ function computeTimecockpitEntryProperties(
   const stringComment = line.substr(indexOfPipe + 1);
   if (stringComment === '') {
     // empty comment
+    console.error('missing comment');
     return;
   }
 
@@ -113,6 +116,7 @@ function computeTimecockpitEntryProperties(
   // date sanity checks
   // valid delimiters
   if ('-' !== stringDate.charAt(4) || '-' !== stringDate.charAt(7)) {
+    console.error('invalid date delimiters');
     return;
   }
   // valid digits: https://stackoverflow.com/questions/175739/built-in-way-in-javascript-to-check-if-a-string-is-a-valid-number
@@ -126,6 +130,7 @@ function computeTimecockpitEntryProperties(
     isNaN(+stringDate.charAt(8)) ||
     isNaN(+stringDate.charAt(9))
   ) {
+    console.error('expected digits for dates');
     return;
   }
   // valid year
@@ -134,23 +139,27 @@ function computeTimecockpitEntryProperties(
   // if (isNaN(integerYear) || integerYear < 2019 || integerYear > 2046) {
   if (
     isNaN(integerYear) ||
-    integerYear < integerYearCurrent ||
+    integerYear < integerYearCurrent - 1 ||
     integerYear > integerYearCurrent
   ) {
+    console.error('invalid year');
     return;
   }
   // valid month
   const integerMonth = parseInt(stringDate.substr(5, 2), 10);
   if (isNaN(integerYear) || integerMonth < 1 || integerMonth > 12) {
+    console.error('invalid month');
     return;
   }
   // valid day
   const integerDay = parseInt(stringDate.substr(8, 2), 10);
   if (isNaN(integerYear) || integerDay < 1 || integerDay > 31) {
+    console.error('invalid day');
     return;
   }
 
   if (!isValidDate(integerYear, integerMonth, integerDay)) {
+    console.error('invalid date');
     return;
   }
 
@@ -158,16 +167,19 @@ function computeTimecockpitEntryProperties(
 
   // valid delimiters
   if (':' !== stringTimeBegin.charAt(2) || ':' !== stringTimeEnd.charAt(2)) {
+    console.error('invalid time delimiter');
     return;
   }
   // valid digits
   if (isInvalidDigit(stringTimeBegin) || isInvalidDigit(stringTimeEnd)) {
+    console.error('expected digits for times');
     return;
   }
   // valid hours
   const integerHourBegin = parseInt(stringTimeBegin.substr(0, 2), 10);
   const integerHourEnd = parseInt(stringTimeEnd.substr(0, 2), 10);
   if (isInvalidHour(integerHourBegin) || isInvalidHour(integerHourEnd)) {
+    console.error('invalid hour');
     return;
   }
   // valid minutes
@@ -177,6 +189,7 @@ function computeTimecockpitEntryProperties(
     isInvalidMinute(integerMinuteBegin) ||
     isInvalidMinute(integerMinuteEnd)
   ) {
+    console.error('invalid minute');
     return;
   }
   // begin actually before end
@@ -185,6 +198,7 @@ function computeTimecockpitEntryProperties(
     (integerHourBegin === integerHourEnd &&
       integerMinuteBegin >= integerMinuteEnd)
   ) {
+    console.error('begin not before end');
     return;
   }
 
